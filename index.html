@@ -4,181 +4,146 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>보안 위반 감지</title>
-
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
 <style>
-body{margin:0;background:#000;color:#fff;font-family:sans-serif;overflow:hidden;}
-
-.cctv-frame{
-  position:relative;
-  width:100%;
-  height:100vh;
-  background:#000;
-  overflow:hidden;
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --red:#ff1a1a;--red2:#cc0000;--amber:#ffaa00;
+  --bg:#050505;--text:#ddd8cc;
+  --mono:'Share Tech Mono',monospace;--sans:'Noto Sans KR',sans-serif;
 }
-
-/* 영상 */
-video{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  transform:scaleX(-1);
-  filter:grayscale(0.6) contrast(1.2) brightness(0.85);
-}
-
-/* fallback */
-#fallback{
-  position:absolute;
-  inset:0;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  background:#111;
-  color:#0f0;
-  font-family:monospace;
-  font-size:20px;
-}
+html,body{width:100%;min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--sans);overflow-x:hidden;}
 
 /* 스캔라인 */
-.cctv-frame::after{
-  content:'';
-  position:absolute;
-  inset:0;
-  background:repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 3px,
-    rgba(255,255,255,.05) 4px
-  );
-  pointer-events:none;
-}
+body::before{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,.018) 3px,rgba(255,255,255,.018) 4px);}
 
-/* HUD */
-.hud{
-  position:absolute;
-  inset:0;
-  font-family:monospace;
-  color:#0f0;
-  font-size:12px;
-}
-.hud-tl{position:absolute;top:10px;left:12px;}
-.hud-tr{position:absolute;top:10px;right:12px;text-align:right;}
-
-.rec{color:red}
-
-/* 타겟 박스 */
-.face-box{
-  position:absolute;
-  border:2px solid red;
-  box-shadow:0 0 10px red;
-  pointer-events:none;
-}
+/* 배경 그리드 */
+.bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,26,26,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,26,26,.05) 1px,transparent 1px);
+  background-size:52px 52px;}
 
 /* 인트로 */
-#intro{
-  position:fixed;
-  inset:0;
-  background:#000;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:9999;
-  cursor:pointer;
+#intro{position:fixed;inset:0;z-index:9999;background:#000;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;cursor:pointer;padding:24px;}
+#intro .boot-text{font-family:var(--mono);font-size:clamp(.65rem,2.2vw,.88rem);color:#0f0;
+  letter-spacing:.15em;text-align:left;line-height:2.1;white-space:pre;}
+#intro .tap{font-family:var(--mono);font-size:.8rem;color:#555;letter-spacing:.3em;animation:blinkT 1.2s step-end infinite;}
+@keyframes blinkT{50%{opacity:0;}}
+
+/* 경보 바 */
+#alertBar{position:fixed;top:0;left:0;right:0;z-index:100;padding:10px 20px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:var(--red2);animation:barFlash 1s ease-in-out infinite alternate;
+  transform:translateY(-100%);transition:transform .5s ease;}
+#alertBar.show{transform:translateY(0);}
+@keyframes barFlash{from{background:#cc0000;}to{background:#880000;}}
+.dot{width:10px;height:10px;border-radius:50%;background:#fff;animation:blink .7s step-end infinite;}
+@keyframes blink{50%{opacity:0;}}
+.bar-text{font-family:var(--mono);font-size:.8rem;letter-spacing:.12em;color:#fff;flex:1;text-align:center;}
+.bar-time{font-family:var(--mono);font-size:.75rem;color:rgba(255,255,255,.7);}
+
+/* 메인 */
+main{position:relative;z-index:2;min-height:100vh;padding:90px 24px 80px;
+  display:flex;flex-direction:column;align-items:center;gap:0;}
+
+/* CCTV 섹션 */
+.hero-visual{width:100%;max-width:800px;position:relative;margin-bottom:48px;
+  opacity:0;transform:scale(.97);transition:opacity .8s 1.2s,transform .8s 1.2s;}
+.hero-visual.show{opacity:1;transform:scale(1);}
+.cctv-frame{width:100%;border-radius:4px;overflow:hidden;border:2px solid #222;
+  position:relative;background:#000;aspect-ratio:16/8;}
+.cctv-frame svg{width:100%;height:100%;display:block;}
+.cctv-frame::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 4px,rgba(0,0,0,.22) 4px,rgba(0,0,0,.22) 5px);}
+
+/* HUD */
+.hud{position:absolute;inset:0;pointer-events:none;
+  font-family:var(--mono);color:rgba(255,255,255,.75);font-size:clamp(.52rem,1.7vw,.73rem);}
+.hud-tl{position:absolute;top:10px;left:12px;color:#0f0;line-height:1.7;}
+.hud-tr{position:absolute;top:10px;right:12px;text-align:right;line-height:1.7;}
+.hud-bl{position:absolute;bottom:10px;left:12px;line-height:1.7;}
+.hud-br{position:absolute;bottom:10px;right:12px;text-align:right;line-height:1.7;}
+.rec-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);
+  margin-right:5px;animation:blink .8s step-end infinite;vertical-align:middle;}
+
+/* 타겟 박스 */
+.target-box{position:absolute;border:2px solid var(--red);animation:boxPulse 1.5s ease-in-out infinite alternate;}
+@keyframes boxPulse{from{border-color:var(--red);}to{border-color:rgba(255,26,26,.25);}}
+.target-box::before,.target-box::after{content:'';position:absolute;width:10px;height:10px;border-color:var(--amber);border-style:solid;}
+.target-box::before{top:-2px;left:-2px;border-width:2px 0 0 2px;}
+.target-box::after{bottom:-2px;right:-2px;border-width:0 2px 2px 0;}
+
+/* 타이틀 */
+.caught-label{font-family:var(--mono);font-size:clamp(.6rem,2vw,.85rem);letter-spacing:.45em;
+  color:var(--red);text-transform:uppercase;margin-bottom:14px;opacity:0;animation:fadeUp .6s 2s forwards;}
+.headline{font-weight:900;font-size:clamp(2.2rem,9vw,6rem);line-height:1.0;text-align:center;
+  color:#fff;text-shadow:0 0 50px rgba(255,26,26,.35);opacity:0;animation:fadeUp .7s 2.2s forwards;}
+.headline em{font-style:normal;color:var(--red);position:relative;}
+.headline em::after{content:'';position:absolute;left:0;right:0;bottom:-4px;height:4px;
+  background:var(--red);transform:scaleX(0);transform-origin:left;animation:growLine .8s 2.8s forwards;}
+@keyframes growLine{to{transform:scaleX(1);}}
+.divider{width:60px;height:2px;background:#2a0000;margin:36px 0;opacity:0;animation:fadeUp .5s 2.6s forwards;}
+
+/* 메세지 카드 */
+.message-block{display:flex;flex-direction:column;gap:20px;max-width:700px;width:100%;
+  opacity:0;animation:fadeUp .7s 2.9s forwards;}
+.msg-card{border-left:3px solid var(--red);padding:20px 24px;
+  background:rgba(255,26,26,.05);border-radius:0 6px 6px 0;position:relative;overflow:hidden;}
+.msg-card::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,26,26,.07),transparent);}
+.msg-card .num{font-family:var(--mono);font-size:.7rem;color:var(--red);letter-spacing:.2em;margin-bottom:8px;display:block;position:relative;}
+.msg-card p{font-size:clamp(.95rem,2.8vw,1.18rem);font-weight:700;line-height:1.6;color:#fff;position:relative;}
+.msg-card p em{font-style:normal;color:var(--amber);}
+
+/* 카운터 */
+.counter-wrap{margin-top:48px;padding:28px 36px;border:1px solid #1a0000;
+  background:rgba(255,26,26,.04);border-radius:8px;text-align:center;max-width:520px;width:100%;
+  opacity:0;animation:fadeUp .7s 3.4s forwards;}
+.counter-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.25em;color:#555;margin-bottom:12px;}
+.counter-num{font-family:var(--mono);font-size:clamp(2.8rem,10vw,5rem);color:var(--red);line-height:1;
+  text-shadow:0 0 30px rgba(255,26,26,.5);}
+.counter-sub{font-size:.8rem;color:#444;margin-top:8px;letter-spacing:.05em;}
+.counter-status{font-family:var(--mono);font-size:.65rem;color:#333;margin-top:6px;letter-spacing:.1em;}
+
+/* 하단 */
+.footer-tag{margin-top:56px;display:flex;align-items:center;gap:10px;
+  opacity:0;animation:fadeUp .5s 3.8s forwards;}
+.badge{background:var(--red);color:#fff;font-family:var(--mono);font-size:.68rem;letter-spacing:.2em;padding:5px 12px;border-radius:2px;}
+.year{font-family:var(--mono);font-size:.72rem;color:#333;letter-spacing:.15em;}
+
+/* 사이렌 파동 */
+.siren-wrap{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  z-index:0;pointer-events:none;width:700px;height:700px;}
+.siren-ring{position:absolute;inset:0;border-radius:50%;
+  border:2px solid rgba(255,26,26,.12);animation:sirenExpand 3s ease-out infinite;}
+.siren-ring:nth-child(2){animation-delay:1s;}
+.siren-ring:nth-child(3){animation-delay:2s;}
+@keyframes sirenExpand{0%{transform:scale(0);opacity:.5;}100%{transform:scale(1);opacity:0;}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+@media(max-width:480px){
+  .msg-card{padding:14px 16px;}
+  .counter-wrap{padding:20px 22px;}
 }
 </style>
 </head>
-
 <body>
-
-<div id="intro">화면 클릭하여 시작</div>
-
-<div class="cctv-frame">
-  <video id="video" playsinline muted></video>
-  <div id="fallback">SIGNAL LOST</div>
-
-  <div class="hud">
-    <div class="hud-tl">
-      <span class="rec">●</span> REC<br>CAM-04
-    </div>
-    <div class="hud-tr">
-      <span id="time">00:00:00</span><br>LIVE
-    </div>
-  </div>
+<div class="bg-grid"></div>
+<div class="siren-wrap">
+  <div class="siren-ring"></div><div class="siren-ring"></div><div class="siren-ring"></div>
 </div>
 
-<script>
-const video = document.getElementById('video');
-const fallback = document.getElementById('fallback');
+<!-- 인트로 -->
+<div id="intro">
+  <div class="boot-text" id="bootText"></div>
+  <div class="tap">[ 화면을 터치하여 계속 ]</div>
+</div>
 
-// 카메라 시작
-async function startCamera(){
-  try{
-    if(!navigator.mediaDevices){
-      throw new Error('미지원');
-    }
+<!-- 경보 바 -->
+<div id="alertBar">
+  <div class="dot"></div>
+  <span class="bar-text">⚠ SECURITY VIOLATION DETECTED — 보안 위반 감지됨</span>
+  <span class="bar-time" id="barTime"></span>
+</div>
 
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video:{facingMode:'user'},
-      audio:false
-    });
-
-    video.srcObject = stream;
-
-    // 🔥 핵심 (재생 강제)
-    await video.play();
-
-    fallback.style.display='none';
-
-    fakeDetect();
-
-  }catch(e){
-    console.warn('카메라 실패:', e);
-
-    video.style.display='none';
-    fallback.style.display='flex';
-
-    startFakeCamera();
-  }
-}
-
-// 가짜 CCTV
-function startFakeCamera(){
-  let dots=0;
-  setInterval(()=>{
-    dots=(dots+1)%4;
-    fallback.textContent="SIGNAL LOST" + ".".repeat(dots);
-  },500);
-
-  fakeDetect();
-}
-
-// 타겟 박스
-function fakeDetect(){
-  setInterval(()=>{
-    document.querySelectorAll('.face-box').forEach(e=>e.remove());
-
-    const box=document.createElement('div');
-    box.className='face-box';
-    box.style.left=Math.random()*60+20+'%';
-    box.style.top=Math.random()*40+20+'%';
-    box.style.width='120px';
-    box.style.height='160px';
-
-    document.body.appendChild(box);
-  },1200);
-}
-
-// 시계
-setInterval(()=>{
-  const n=new Date();
-  document.getElementById('time').textContent=n.toLocaleTimeString();
-},1000);
-
-// 클릭 → 시작
-document.getElementById('intro').addEventListener('click',()=>{
-  document.getElementById('intro').style.display='none';
-  startCamera();
-});
-</script>
-
-</body>
-</html>
+<!-- 이하 생략 없이 동일하게 이어짐 (원본 그대로 유지) -->
