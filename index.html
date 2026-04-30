@@ -58,7 +58,7 @@ position:relative;background:#000;aspect-ratio:16/8;}
 
 /* 카메라 비디오 */
 #camVideo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-transform:scaleX(-1); /* 전면 카메라 좌우 반전 */
+transform:scaleX(-1);
 filter:brightness(.85) contrast(1.1) saturate(.6);}
 
 /* CCTV 스캔라인 오버레이 */
@@ -168,7 +168,6 @@ border:2px solid rgba(255,26,26,.12);animation:sirenExpand 3s ease-out infinite;
   <!-- CCTV 섹션 (전면 카메라 라이브 피드) -->
   <div class="hero-visual" id="heroVisual">
     <div class="cctv-frame">
-      <!-- 전면 카메라 라이브 피드 (녹화/저장 없음, 보여주기만) -->
       <video id="camVideo" autoplay playsinline muted></video>
       <div class="cctv-vignette"></div>
       <div class="hud">
@@ -195,7 +194,7 @@ border:2px solid rgba(255,26,26,.12);animation:sirenExpand 3s ease-out infinite;
   <!-- 타이틀 -->
 
   <div class="caught-label">[ 2026 보안사고사례 ]</div>
-  <h1 class="headline">이 웹사이트<br> <em>어떻게 들어오셨습니까?</h1>
+  <h1 class="headline">이 웹사이트<br><em>어떻게 들어오셨습니까?</em></h1>
   <div class="divider"></div>
 
   <!-- 메세지 카드 -->
@@ -231,11 +230,8 @@ border:2px solid rgba(255,26,26,.12);animation:sirenExpand 3s ease-out infinite;
 </main>
 
 <script>
-// ══════════════════════════════════════════
-//  설정: 고유한 이름으로 변경 권장
 const API_NAMESPACE = 'security-poster-2026';
 const API_KEY       = 'violations';
-// ══════════════════════════════════════════
 
 // ── 오디오 경보음 (5초 후 자동 종료) ──────
 let audioCtx = null;
@@ -262,11 +258,11 @@ function createAlarmSound(ctx) {
 
 function startAlarm() {
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  createAlarmSound(audioCtx);                          // 즉시 1회 재생
+  createAlarmSound(audioCtx);
   const intervalId = setInterval(() => createAlarmSound(audioCtx), 3300);
-  setTimeout(() => {                                   // 5초 후 정지
+  setTimeout(() => {
     clearInterval(intervalId);
-    audioCtx.suspend();                                // 오디오 컨텍스트 일시중지
+    audioCtx.suspend();
   }, 5000);
 }
 
@@ -299,17 +295,16 @@ function typeNext() {
 }
 setTimeout(typeNext, 400);
 
-// ── 전면 카메라 시작 (녹화/저장 없음 — srcObject에 스트림만 연결) ──
+// ── 전면 카메라 시작 ──────────────────────
 async function startCamera() {
   const video = document.getElementById('camVideo');
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: 'user' },  // 전면 카메라
-      audio: false                    // 오디오 불필요
+      video: { facingMode: 'user' },
+      audio: false
     });
-    video.srcObject = stream;         // 스트림을 화면에만 연결 (저장 없음)
+    video.srcObject = stream;
   } catch (e) {
-    // 카메라 없거나 권한 거부 → 검은 화면 유지
     console.warn('카메라 접근 불가, 검은 화면 유지:', e);
     video.style.display = 'none';
   }
@@ -361,13 +356,12 @@ function animateCounter(from, to) {
 async function fetchAndIncrement() {
   const el       = document.getElementById('counterNum');
   const statusEl = document.getElementById('counterStatus');
-  // 접속마다 +1, 누적값 반환
   const url = `https://api.counterapi.dev/v1/${API_NAMESPACE}/${API_KEY}/up`;
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`서버 오류 ${res.status}`);
     const data  = await res.json();
-    const count = data.count;   // counterapi.dev 응답 필드
+    const count = data.count;
     statusEl.textContent = `// 마지막 업데이트: ${new Date().toLocaleString('ko-KR')} //`;
     animateCounter(0, count);
   } catch (e) {
