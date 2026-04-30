@@ -7,92 +7,162 @@
 
 <style>
 body{margin:0;background:#000;color:#fff;font-family:sans-serif;overflow:hidden;}
-.cctv-frame{position:relative;width:100%;aspect-ratio:16/8;background:#000;overflow:hidden;}
-video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);
-filter:grayscale(0.6) contrast(1.2) brightness(0.85);}
+
+.cctv-frame{
+  position:relative;
+  width:100%;
+  height:100vh;
+  background:#000;
+  overflow:hidden;
+}
+
+/* 영상 */
+video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  transform:scaleX(-1);
+  filter:grayscale(0.6) contrast(1.2) brightness(0.85);
+}
+
+/* fallback */
+#fallback{
+  position:absolute;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:#111;
+  color:#0f0;
+  font-family:monospace;
+  font-size:20px;
+}
 
 /* 스캔라인 */
 .cctv-frame::after{
-content:'';position:absolute;inset:0;
-background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,.05) 4px);
-pointer-events:none;
+  content:'';
+  position:absolute;
+  inset:0;
+  background:repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(255,255,255,.05) 4px
+  );
+  pointer-events:none;
 }
 
 /* HUD */
-.hud{position:absolute;inset:0;color:#0f0;font-family:monospace;font-size:12px;}
+.hud{
+  position:absolute;
+  inset:0;
+  font-family:monospace;
+  color:#0f0;
+  font-size:12px;
+}
 .hud-tl{position:absolute;top:10px;left:12px;}
 .hud-tr{position:absolute;top:10px;right:12px;text-align:right;}
+
 .rec{color:red}
 
 /* 타겟 박스 */
 .face-box{
-position:absolute;border:2px solid red;
-box-shadow:0 0 10px red;
-pointer-events:none;
+  position:absolute;
+  border:2px solid red;
+  box-shadow:0 0 10px red;
+  pointer-events:none;
 }
 
-/* 기본 레이아웃 */
-main{padding:40px;text-align:center;}
-button{padding:12px 20px;font-size:16px;}
+/* 인트로 */
+#intro{
+  position:fixed;
+  inset:0;
+  background:#000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+  cursor:pointer;
+}
 </style>
 </head>
 
 <body>
 
-<!-- 인트로 -->
-<div id="intro" style="position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:9999;">
-  <div>화면 클릭하여 시작</div>
-</div>
+<div id="intro">화면 클릭하여 시작</div>
 
-<main>
-
-<!-- CCTV -->
 <div class="cctv-frame">
-  <video id="video" autoplay playsinline muted></video>
+  <video id="video" playsinline muted></video>
+  <div id="fallback">SIGNAL LOST</div>
 
   <div class="hud">
     <div class="hud-tl">
-      <span class="rec">●</span> REC<br>
-      CAM-04
+      <span class="rec">●</span> REC<br>CAM-04
     </div>
     <div class="hud-tr">
-      <span id="time">00:00:00</span><br>
-      LIVE
+      <span id="time">00:00:00</span><br>LIVE
     </div>
   </div>
 </div>
 
-<h1>지금, 당신의 보안은 안녕하십니까?</h1>
-
-<div id="counter">---</div>
-
-</main>
-
 <script>
+const video = document.getElementById('video');
+const fallback = document.getElementById('fallback');
+
 // 카메라 시작
 async function startCamera(){
   try{
+    if(!navigator.mediaDevices){
+      throw new Error('미지원');
+    }
+
     const stream = await navigator.mediaDevices.getUserMedia({
       video:{facingMode:'user'},
       audio:false
     });
-    document.getElementById('video').srcObject = stream;
+
+    video.srcObject = stream;
+
+    // 🔥 핵심 (재생 강제)
+    await video.play();
+
+    fallback.style.display='none';
+
     fakeDetect();
+
   }catch(e){
-    alert('카메라 권한 필요');
+    console.warn('카메라 실패:', e);
+
+    video.style.display='none';
+    fallback.style.display='flex';
+
+    startFakeCamera();
   }
 }
 
-// 가짜 얼굴 감지
+// 가짜 CCTV
+function startFakeCamera(){
+  let dots=0;
+  setInterval(()=>{
+    dots=(dots+1)%4;
+    fallback.textContent="SIGNAL LOST" + ".".repeat(dots);
+  },500);
+
+  fakeDetect();
+}
+
+// 타겟 박스
 function fakeDetect(){
   setInterval(()=>{
     document.querySelectorAll('.face-box').forEach(e=>e.remove());
+
     const box=document.createElement('div');
     box.className='face-box';
     box.style.left=Math.random()*60+20+'%';
     box.style.top=Math.random()*40+20+'%';
     box.style.width='120px';
     box.style.height='160px';
+
     document.body.appendChild(box);
   },1200);
 }
@@ -103,18 +173,10 @@ setInterval(()=>{
   document.getElementById('time').textContent=n.toLocaleTimeString();
 },1000);
 
-// 카운터
-let count=0;
-function updateCounter(){
-  count++;
-  document.getElementById('counter').textContent=count;
-}
-
-// 인트로 클릭
+// 클릭 → 시작
 document.getElementById('intro').addEventListener('click',()=>{
   document.getElementById('intro').style.display='none';
   startCamera();
-  updateCounter();
 });
 </script>
 
