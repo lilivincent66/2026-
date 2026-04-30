@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="ko">
 <head>
 <meta charset="UTF-8"/>
@@ -15,120 +16,132 @@
 html,body{width:100%;min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--sans);overflow-x:hidden;}
 
 /* 스캔라인 */
-body::before{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;
-  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,.018) 3px,rgba(255,255,255,.018) 4px);}
+body::before{content:’’;position:fixed;inset:0;z-index:1;pointer-events:none;
+background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,.018) 3px,rgba(255,255,255,.018) 4px);}
 
 /* 배경 그리드 */
 .bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:linear-gradient(rgba(255,26,26,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,26,26,.05) 1px,transparent 1px);
-  background-size:52px 52px;}
+background-image:linear-gradient(rgba(255,26,26,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,26,26,.05) 1px,transparent 1px);
+background-size:52px 52px;}
 
 /* 인트로 */
 #intro{position:fixed;inset:0;z-index:9999;background:#000;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;cursor:pointer;padding:24px;}
-#intro .boot-text{font-family:var(--mono);font-size:clamp(.65rem,2.2vw,.88rem);color:#0f0;
-  letter-spacing:.15em;text-align:left;line-height:2.1;white-space:pre;}
-#intro .tap{font-family:var(--mono);font-size:.8rem;color:#555;letter-spacing:.3em;animation:blinkT 1.2s step-end infinite;}
+display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;cursor:pointer;padding:24px;}
+#intro .boot-text{font-family:var(–mono);font-size:clamp(.65rem,2.2vw,.88rem);color:#0f0;
+letter-spacing:.15em;text-align:left;line-height:2.1;white-space:pre;}
+#intro .tap{font-family:var(–mono);font-size:.8rem;color:#555;letter-spacing:.3em;animation:blinkT 1.2s step-end infinite;}
 @keyframes blinkT{50%{opacity:0;}}
 
 /* 경보 바 */
-#alertBar{position:fixed;top:0;left:0;right:0;z-index:100;padding:10px 20px;
-  display:flex;align-items:center;justify-content:space-between;gap:12px;
-  background:var(--red2);animation:barFlash 1s ease-in-out infinite alternate;
-  transform:translateY(-100%);transition:transform .5s ease;}
+#alertBar{position:fixed;top:0;left:0;right:0;z-index:100;padding:8px 14px;
+display:flex;align-items:center;justify-content:space-between;gap:8px;
+background:var(–red2);animation:barFlash 1s ease-in-out infinite alternate;
+transform:translateY(-100%);transition:transform .5s ease;}
 #alertBar.show{transform:translateY(0);}
 @keyframes barFlash{from{background:#cc0000;}to{background:#880000;}}
-.dot{width:10px;height:10px;border-radius:50%;background:#fff;animation:blink .7s step-end infinite;}
+.dot{width:8px;height:8px;border-radius:50%;background:#fff;flex-shrink:0;animation:blink .7s step-end infinite;}
 @keyframes blink{50%{opacity:0;}}
-.bar-text{font-family:var(--mono);font-size:.8rem;letter-spacing:.12em;color:#fff;flex:1;text-align:center;}
-.bar-time{font-family:var(--mono);font-size:.75rem;color:rgba(255,255,255,.7);}
+.bar-text{font-family:var(–mono);font-size:clamp(.58rem,2.4vw,.8rem);letter-spacing:.04em;color:#fff;
+flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bar-time{font-family:var(–mono);font-size:clamp(.58rem,2vw,.75rem);color:rgba(255,255,255,.7);flex-shrink:0;}
 
 /* 메인 */
 main{position:relative;z-index:2;min-height:100vh;padding:90px 24px 80px;
-  display:flex;flex-direction:column;align-items:center;gap:0;}
+display:flex;flex-direction:column;align-items:center;gap:0;}
 
 /* CCTV 섹션 */
 .hero-visual{width:100%;max-width:800px;position:relative;margin-bottom:48px;
-  opacity:0;transform:scale(.97);transition:opacity .8s 1.2s,transform .8s 1.2s;}
+opacity:0;transform:scale(.97);transition:opacity .8s 1.2s,transform .8s 1.2s;}
 .hero-visual.show{opacity:1;transform:scale(1);}
 .cctv-frame{width:100%;border-radius:4px;overflow:hidden;border:2px solid #1a1a1a;
-  position:relative;background:#000;aspect-ratio:16/8;}
+position:relative;background:#000;aspect-ratio:16/8;}
 
 /* 카메라 비디오 */
 #camVideo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-  transform:scaleX(-1); /* 전면 카메라 좌우 반전 */
-  filter:brightness(.85) contrast(1.1) saturate(.6);}
+transform:scaleX(-1); /* 전면 카메라 좌우 반전 */
+filter:brightness(.85) contrast(1.1) saturate(.6);}
 
 /* CCTV 스캔라인 오버레이 */
-.cctv-frame::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:3;
-  background:repeating-linear-gradient(0deg,transparent,transparent 4px,rgba(0,0,0,.25) 4px,rgba(0,0,0,.25) 5px);}
+.cctv-frame::after{content:’’;position:absolute;inset:0;pointer-events:none;z-index:3;
+background:repeating-linear-gradient(0deg,transparent,transparent 4px,rgba(0,0,0,.25) 4px,rgba(0,0,0,.25) 5px);}
 
 /* 비네트 */
 .cctv-vignette{position:absolute;inset:0;z-index:4;pointer-events:none;
-  background:radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,.7) 100%);}
+background:radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,.7) 100%);}
 
 /* HUD */
 .hud{position:absolute;inset:0;pointer-events:none;
-  font-family:var(--mono);color:rgba(255,255,255,.75);font-size:clamp(.52rem,1.7vw,.73rem);z-index:2;}
+font-family:var(–mono);color:rgba(255,255,255,.75);font-size:clamp(.52rem,1.7vw,.73rem);z-index:2;}
 .hud-tl{position:absolute;top:10px;left:12px;color:#0f0;line-height:1.7;}
 .hud-tr{position:absolute;top:10px;right:12px;text-align:right;line-height:1.7;}
 .hud-bl{position:absolute;bottom:10px;left:12px;line-height:1.7;}
 .hud-br{position:absolute;bottom:10px;right:12px;text-align:right;line-height:1.7;}
-.rec-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);
-  margin-right:5px;animation:blink .8s step-end infinite;vertical-align:middle;}
+.rec-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(–red);
+margin-right:5px;animation:blink .8s step-end infinite;vertical-align:middle;}
 
 /* 타이틀 */
-.caught-label{font-family:var(--mono);font-size:clamp(.6rem,2vw,.85rem);letter-spacing:.45em;
-  color:var(--red);text-transform:uppercase;margin-bottom:14px;opacity:0;animation:fadeUp .6s 2s forwards;}
-.headline{font-weight:900;font-size:clamp(2.2rem,9vw,6rem);line-height:1.0;text-align:center;
-  color:#fff;text-shadow:0 0 50px rgba(255,26,26,.35);opacity:0;animation:fadeUp .7s 2.2s forwards;}
-.headline em{font-style:normal;color:var(--red);position:relative;}
-.headline em::after{content:'';position:absolute;left:0;right:0;bottom:-4px;height:4px;
-  background:var(--red);transform:scaleX(0);transform-origin:left;animation:growLine .8s 2.8s forwards;}
+.caught-label{font-family:var(–mono);font-size:clamp(.55rem,2vw,.85rem);letter-spacing:clamp(.1em,.4vw,.45em);
+color:var(–red);text-transform:uppercase;margin-bottom:14px;opacity:0;animation:fadeUp .6s 2s forwards;}
+.headline{font-weight:900;font-size:clamp(1.9rem,8vw,6rem);line-height:1.05;text-align:center;
+word-break:keep-all;word-wrap:break-word;
+color:#fff;text-shadow:0 0 50px rgba(255,26,26,.35);opacity:0;animation:fadeUp .7s 2.2s forwards;}
+.headline em{font-style:normal;color:var(–red);position:relative;}
+.headline em::after{content:’’;position:absolute;left:0;right:0;bottom:-4px;height:4px;
+background:var(–red);transform:scaleX(0);transform-origin:left;animation:growLine .8s 2.8s forwards;}
 @keyframes growLine{to{transform:scaleX(1);}}
-.divider{width:60px;height:2px;background:#2a0000;margin:36px 0;opacity:0;animation:fadeUp .5s 2.6s forwards;}
+.divider{width:60px;height:2px;background:#2a0000;margin:28px 0;opacity:0;animation:fadeUp .5s 2.6s forwards;}
 
 /* 메세지 카드 */
-.message-block{display:flex;flex-direction:column;gap:20px;max-width:700px;width:100%;
-  opacity:0;animation:fadeUp .7s 2.9s forwards;}
-.msg-card{border-left:3px solid var(--red);padding:20px 24px;
-  background:rgba(255,26,26,.05);border-radius:0 6px 6px 0;position:relative;overflow:hidden;}
-.msg-card::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,26,26,.07),transparent);}
-.msg-card .num{font-family:var(--mono);font-size:.7rem;color:var(--red);letter-spacing:.2em;margin-bottom:8px;display:block;position:relative;}
-.msg-card p{font-size:clamp(.95rem,2.8vw,1.18rem);font-weight:700;line-height:1.6;color:#fff;position:relative;}
-.msg-card p em{font-style:normal;color:var(--amber);}
+.message-block{display:flex;flex-direction:column;gap:16px;max-width:700px;width:100%;
+opacity:0;animation:fadeUp .7s 2.9s forwards;}
+.msg-card{border-left:3px solid var(–red);padding:16px 18px;
+background:rgba(255,26,26,.05);border-radius:0 6px 6px 0;position:relative;overflow:hidden;}
+.msg-card::before{content:’’;position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,26,26,.07),transparent);}
+.msg-card .num{font-family:var(–mono);font-size:clamp(.6rem,2vw,.7rem);color:var(–red);
+letter-spacing:.15em;margin-bottom:6px;display:block;position:relative;}
+.msg-card p{font-size:clamp(.9rem,2.5vw,1.15rem);font-weight:700;line-height:1.65;
+color:#fff;position:relative;word-break:keep-all;word-wrap:break-word;}
+.msg-card p em{font-style:normal;color:var(–amber);}
 
 /* 카운터 */
-.counter-wrap{margin-top:48px;padding:28px 36px;border:1px solid #1a0000;
-  background:rgba(255,26,26,.04);border-radius:8px;text-align:center;max-width:520px;width:100%;
-  opacity:0;animation:fadeUp .7s 3.4s forwards;}
-.counter-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.25em;color:#555;margin-bottom:12px;}
-.counter-num{font-family:var(--mono);font-size:clamp(2.8rem,10vw,5rem);color:var(--red);line-height:1;
-  text-shadow:0 0 30px rgba(255,26,26,.5);}
-.counter-sub{font-size:.8rem;color:#444;margin-top:8px;letter-spacing:.05em;}
-.counter-status{font-family:var(--mono);font-size:.65rem;color:#333;margin-top:6px;letter-spacing:.1em;}
+.counter-wrap{margin-top:40px;padding:24px 20px;border:1px solid #1a0000;
+background:rgba(255,26,26,.04);border-radius:8px;text-align:center;max-width:520px;width:100%;
+opacity:0;animation:fadeUp .7s 3.4s forwards;}
+.counter-label{font-family:var(–mono);font-size:clamp(.58rem,2vw,.7rem);
+letter-spacing:clamp(.05em,.2vw,.25em);color:#555;margin-bottom:12px;word-break:break-all;}
+.counter-num{font-family:var(–mono);font-size:clamp(2.4rem,10vw,5rem);color:var(–red);line-height:1;
+text-shadow:0 0 30px rgba(255,26,26,.5);}
+.counter-sub{font-size:clamp(.75rem,2.5vw,.8rem);color:#444;margin-top:8px;letter-spacing:.03em;}
+.counter-status{font-family:var(–mono);font-size:clamp(.55rem,1.8vw,.65rem);color:#333;margin-top:6px;
+letter-spacing:.05em;word-break:break-all;}
 
 /* 하단 */
-.footer-tag{margin-top:56px;display:flex;align-items:center;gap:10px;
-  opacity:0;animation:fadeUp .5s 3.8s forwards;}
-.badge{background:var(--red);color:#fff;font-family:var(--mono);font-size:.68rem;letter-spacing:.2em;padding:5px 12px;border-radius:2px;}
-.year{font-family:var(--mono);font-size:.72rem;color:#333;letter-spacing:.15em;}
+.footer-tag{margin-top:48px;display:flex;align-items:center;flex-wrap:wrap;justify-content:center;gap:8px;
+opacity:0;animation:fadeUp .5s 3.8s forwards;}
+.badge{background:var(–red);color:#fff;font-family:var(–mono);font-size:clamp(.6rem,2vw,.68rem);
+letter-spacing:.12em;padding:5px 12px;border-radius:2px;white-space:nowrap;}
+.year{font-family:var(–mono);font-size:clamp(.6rem,2vw,.72rem);color:#333;
+letter-spacing:.08em;text-align:center;}
 
 /* 사이렌 파동 */
 .siren-wrap{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
-  z-index:0;pointer-events:none;width:700px;height:700px;}
+z-index:0;pointer-events:none;width:700px;height:700px;}
 .siren-ring{position:absolute;inset:0;border-radius:50%;
-  border:2px solid rgba(255,26,26,.12);animation:sirenExpand 3s ease-out infinite;}
+border:2px solid rgba(255,26,26,.12);animation:sirenExpand 3s ease-out infinite;}
 .siren-ring:nth-child(2){animation-delay:1s;}
 .siren-ring:nth-child(3){animation-delay:2s;}
 @keyframes sirenExpand{0%{transform:scale(0);opacity:.5;}100%{transform:scale(1);opacity:0;}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 
+/* 인트로 부팅 텍스트 — 작은 화면 대응 */
 @media(max-width:480px){
-  .msg-card{padding:14px 16px;}
-  .counter-wrap{padding:20px 22px;}
+#intro .boot-text{white-space:pre-wrap;font-size:clamp(.6rem,3.5vw,.82rem);letter-spacing:.05em;}
+.msg-card{padding:14px 14px;}
+.counter-wrap{padding:20px 16px;}
+.hud{font-size:clamp(.45rem,2.8vw,.65rem);}
 }
 </style>
+
 </head>
 <body>
 <div class="bg-grid"></div>
@@ -137,12 +150,14 @@ main{position:relative;z-index:2;min-height:100vh;padding:90px 24px 80px;
 </div>
 
 <!-- 인트로 -->
+
 <div id="intro">
   <div class="boot-text" id="bootText"></div>
   <div class="tap">[ 화면을 터치하여 계속 ]</div>
 </div>
 
 <!-- 경보 바 -->
+
 <div id="alertBar">
   <div class="dot"></div>
   <span class="bar-text">⚠ SECURITY VIOLATION DETECTED — 보안 위반 감지됨</span>
@@ -178,11 +193,13 @@ main{position:relative;z-index:2;min-height:100vh;padding:90px 24px 80px;
   </div>
 
   <!-- 타이틀 -->
+
   <div class="caught-label">[ 2026 보안사고사례 ]</div>
-  <h1 class="headline">이 웹사이트<br> <em>어떻게 들어오셨습니까?</em></h1>
+  <h1 class="headline">이 웹사이트<br> <em>어떻게 들어오셨습니까?</h1>
   <div class="divider"></div>
 
   <!-- 메세지 카드 -->
+
   <div class="message-block">
     <div class="msg-card">
       <span class="num">01 / VIOLATION CONFIRMED</span>
@@ -194,11 +211,12 @@ main{position:relative;z-index:2;min-height:100vh;padding:90px 24px 80px;
     </div>
     <div class="msg-card">
       <span class="num">03 / THE REAL THREAT</span>
-      <p>보안사고는 다른 곳에서 시작되지 않습니다. <em>규정을 가볍게 여기는 '나'</em>로부터 시작됩니다. </p>
+      <p>보안사고는 다른 곳에서 시작되지 않습니다. <em>규정을 가볍게 여기는 '나'</em>로부터 시작됩니다.</p>
     </div>
   </div>
 
   <!-- 누적 카운터 -->
+
   <div class="counter-wrap">
     <div class="counter-label">// 포스터 배포 이후 누적 보안 위반 적발 //</div>
     <div class="counter-num" id="counterNum">---</div>
@@ -361,5 +379,6 @@ async function fetchAndIncrement() {
   }
 }
 </script>
+
 </body>
 </html>
