@@ -223,8 +223,8 @@ border:2px solid rgba(255,26,26,.12);animation:sirenExpand 3s ease-out infinite;
 </main>
 
 <script>
-const API_NAMESPACE = 'security-poster-2026';
-const API_KEY       = 'violations';
+// ── Firebase Realtime Database 설정 ──────
+const FIREBASE_URL = 'https://security-4a5e7-default-rtdb.firebaseio.com/counter.json';
 
 // ── 오디오 경보음 (5초 후 자동 종료) ──────
 let audioCtx = null;
@@ -345,20 +345,29 @@ function animateCounter(from, to) {
   }, interval);
 }
 
-// ── 실제 서버 카운터 (counterapi.dev) ────────
+// ── Firebase Realtime Database 카운터 ────────
 async function fetchAndIncrement() {
   const el       = document.getElementById('counterNum');
   const statusEl = document.getElementById('counterStatus');
-  const url = `https://api.counterapi.dev/v1/${API_NAMESPACE}/${API_KEY}/up`;
   try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`서버 오류 ${res.status}`);
-    const data  = await res.json();
-    const count = data.count;
+    // 1. 현재 값 읽기
+    const getRes = await fetch(FIREBASE_URL);
+    if (!getRes.ok) throw new Error(`읽기 오류 ${getRes.status}`);
+    const current = (await getRes.json()) || 0;
+
+    // 2. +1 해서 저장
+    const newCount = current + 1;
+    const putRes = await fetch(FIREBASE_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newCount)
+    });
+    if (!putRes.ok) throw new Error(`쓰기 오류 ${putRes.status}`);
+
     statusEl.textContent = `// 마지막 업데이트: ${new Date().toLocaleString('ko-KR')} //`;
-    animateCounter(0, count);
+    animateCounter(0, newCount);
   } catch (e) {
-    console.warn('CounterAPI 연결 실패, 로컬 폴백:', e);
+    console.warn('Firebase 연결 실패, 로컬 폴백:', e);
     const stored = parseInt(localStorage.getItem('sec_count') || '0') + 1;
     localStorage.setItem('sec_count', stored);
     el.textContent = String(stored).padStart(3, '0');
